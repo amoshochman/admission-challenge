@@ -1,38 +1,48 @@
-servers=[
-{
-  :hostname => "server1",
-  :ip => "192.168.100.10",
-  :box => "ubuntu/focal64",
-  :ram => 512,
-  :cpu => 1,
-  :provisions => [".bootstrap/bootstrap.sh","fixScripts/exercise1-fix.sh","fixScripts/exercise2-fix.sh","fixScripts/exercise3-fix.sh","fixScripts/exercise5-fix_server1.sh","fixScripts/exercise4-fix_server1.sh"]
-},
-{
-  :hostname => "server2",
-  :ip => "192.168.100.11",
-  :box => "ubuntu/focal64",
-  :ram => 512,
-  :cpu => 1,
-  :provisions => ["fixScripts/exercise5-fix_server2.sh","fixScripts/exercise4-fix_server2.sh"]
-}
-]
+numnodes=2
+baseip="192.168.100"
 
-Vagrant.configure(2) do |config|
-  servers.each do |machine|
-    config.vm.define machine[:hostname] do |node|
-        machine [:provisions].each do |script|
-           node.vm.provision :shell, :path => script
-        end
-      node.vm.box = machine[:box]
-      node.vm.hostname = machine[:hostname]
-      node.vm.network "private_network", ip: machine[:ip]
-      node.vm.provider "virtualbox" do |vb|
-        vb.customize [ "modifyvm", :id, "--uartmode1", "file", File::NULL ]
-        vb.memory = machine[:ram]
-        vb.cpus = machine[:cpu]
-      end
+#global script
+$global = <<SCRIPT
+#check for private key for vm-vm comm
+[ -f /vagrant/id_rsa ] || {
+  ssh-keygen -t rsa -f /vagrant/id_rsa -q -N ''
+}
+#deploy key
+[ -f /home/vagrant/.ssh/id_rsa ] || {
+    cp /vagrant/id_rsa /home/vagrant/.ssh/id_rsa
+    chmod 0600 /home/vagrant/.ssh/id_rsa
+}
+#allow ssh passwordless
+grep 'vagrant@node' ~/.ssh/authorized_keys &>/dev/null || {
+  cat /vagrant/id_rsa.pub >> ~/.ssh/authorized_keys
+  chmod 0600 ~/.ssh/authorized_keys
+}
+#exclude server* from host checking
+cat > ~/.ssh/config <<EOF
+Host server*
+   StrictHostKeyChecking no
+   UserKnownHostsFile=/dev/null
+EOF
+#populate /etc/hosts
+for x in {11..#{10+numnodes}}; do
+  grep #{baseip}.${x} /etc/hosts &>/dev/null || {
+      echo #{baseip}.${x} server${x##?} | sudo tee -a /etc/hosts &>/dev/null
+  }
+done
+#end script
+SCRIPT
+
+Vagrant.configure("2") do |config|
+  config.vm.provision "shell", privileged: false, inline: $global
+  prefix="server"
+  #server box
+  (1..numnodes).each do |i|
+    vm_name = "#{prefix}#{i}"
+    config.vm.define vm_name do |node|
+      node.vm.box = "ubuntu/focal64"
+      node.vm.hostname = vm_name
+      ip="#{baseip}.#{10+i}"
+      node.vm.network "private_network", ip: ip
     end
   end
 end
-
-
