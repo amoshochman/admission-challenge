@@ -1,10 +1,10 @@
 #we need to check if we can first ssh and then copy everything
 #we need to check if we can call the script from both places it's requested to
 
-dest_folder="${@: -1}"
+dest_folder=${@: -1}
 temp_folder=$(mktemp -d --tmpdir=/vagrant)/
 hostname=$(hostname)
-#bytes=0
+total_size=0
 
 if [ $hostname == "server1" ]
 then
@@ -20,11 +20,12 @@ do
   command+="$(basename -- $1) "
   command+=$dest_folder
   ssh vagrant@$dest_server $command
-  #bytes+=1
+  cur_size=$(wc -c < $1)
+  let total_size=$total_size+$cur_size
   shift
 done
 
-#echo $bytes
+echo $total_size
 
 rm -r $temp_folder
 
