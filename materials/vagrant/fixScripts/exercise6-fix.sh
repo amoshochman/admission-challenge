@@ -1,3 +1,4 @@
+#todo: check if we can remove the first lines "bin..."
 #we need to check if we can first ssh and then copy everything
 #we need to check if we can call the script from both places it's requested to
 
@@ -28,4 +29,3 @@ done
 echo $total_size
 
 rm -r $temp_folder
-
