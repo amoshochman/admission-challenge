@@ -1,3 +1,4 @@
+#!/bin/bash
 sudo -u vagrant -i <<'EOF'
 
 yes | ssh-keygen -t rsa -f /vagrant/id_rsa -q -N ''

@@ -1,3 +1,4 @@
+#!/bin/bash
 sudo -u vagrant -i <<'EOF'
 
 cp /vagrant/id_rsa /home/vagrant/.ssh/id_rsa
