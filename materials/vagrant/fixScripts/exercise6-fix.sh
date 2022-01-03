@@ -1,6 +1,6 @@
 #!/bin/bash
-#we need to check if we can first ssh and then copy everything
-#we need to check if we can call the script from both places it's requested to
+#users stuff: need to run from both root and vagrant.
+#too much "echo" in previous script
 
 dest_folder=${@: -1}
 temp_folder=$(mktemp -d --tmpdir=/vagrant)/
