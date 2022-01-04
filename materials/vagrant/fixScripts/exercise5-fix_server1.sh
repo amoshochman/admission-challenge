@@ -11,7 +11,20 @@ chmod 0600 ~/.ssh/authorized_keys
 
 EOF
 
-#touch ~/.ssh/config
-#echo 'Host server*' > ~/.ssh/config
-#echo '  StrictHostKeyChecking no' >> ~/.ssh/config
-#echo '  UserKnownHostsFile=/dev/null' >> ~/.ssh/config
+cat > /home/vagrant/.ssh/config <<EOF
+Host server*
+   StrictHostKeyChecking no
+   UserKnownHostsFile=/dev/null
+EOF
+
+cp /vagrant/id_rsa /root/.ssh/id_rsa
+chmod 0600 /root/.ssh/id_rsa
+
+cat /vagrant/id_rsa.pub >> /root/.ssh/authorized_keys
+chmod 0600 /root/.ssh/authorized_keys
+
+cat > /root/.ssh/config <<EOF
+Host server*
+   StrictHostKeyChecking no
+   UserKnownHostsFile=/dev/null
+EOF
