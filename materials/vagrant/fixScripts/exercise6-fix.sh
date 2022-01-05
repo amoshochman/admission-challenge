@@ -1,7 +1,4 @@
 #!/bin/bash
-#users stuff: need to run from both root and vagrant.
-#too much "echo" in previous script
-
 dest_folder=${@: -1}
 temp_folder=$(mktemp -d --tmpdir=/vagrant)/
 hostname=$(hostname)
