@@ -1,4 +1,5 @@
 #!/bin/bash
+#This file (and the analog one for server2) should be cleaned, there is repeated code.
 sudo -u vagrant -i <<'EOF'
 
 ssh-keygen -t rsa -f /vagrant/id_rsa -q -N ''
